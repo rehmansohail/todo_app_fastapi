@@ -1,10 +1,14 @@
 from sqlmodel import SQLModel, create_engine, Session
+from dotenv import load_dotenv
+import os
 
-sqlite_file_name="database.db"
-sqlite_url=f"sqlite:///{sqlite_file_name}"
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+
+postgres_url = DATABASE_URL
+
+engine = create_engine(postgres_url)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
