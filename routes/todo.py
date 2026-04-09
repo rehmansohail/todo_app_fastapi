@@ -1,7 +1,7 @@
 from fastapi import APIRouter,HTTPException,Query,Depends
 from typing import Annotated
 from sqlmodel import Session, select
-from models import *
+from models.todo import *
 from database import get_session
 
 router = APIRouter(tags=["todos"])

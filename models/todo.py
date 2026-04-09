@@ -16,3 +16,4 @@ class TodoUpdate(SQLModel):
     title: str | None = None
     description: str | None = None
     completed: bool | None = None
+
