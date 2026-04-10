@@ -1,12 +1,13 @@
 from passlib.context import CryptContext
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 import os
 from fastapi.security import OAuth2PasswordBearer
-from sqlmodel import Session
-from fastapi import Depends
+from sqlmodel import Session,select
+from fastapi import Depends,HTTPException
 from database import get_session
 from typing import Annotated
+from models.user import *
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
@@ -16,7 +17,7 @@ pwd_context = CryptContext(
 )
 SECRET_KEY=os.getenv("SECRET_KEY")
 ALGORITHM="HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def hashPassword(password: str):
     return pwd_context.hash(password)
@@ -32,4 +33,15 @@ def create_access_token(user_id):
     return token
 
 def get_current_user(session: SessionDep,token:str=Depends(oauth2_scheme)):
-    return 2
+    try:
+        payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        user_id=payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="No such user")
+        existing_user= session.exec(select(User).where(User.id==user_id)).first()
+        if(existing_user is None):
+            raise HTTPException(status_code=401,detail="user doesnt exists, signup first")
+        return int(user_id)
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
