@@ -10,8 +10,10 @@ from limiter import limiter
 router = APIRouter(tags=["authentication"])
 SessionDep = Annotated[Session, Depends(get_session)]
 
+rate_limit= "20/minute"
+
 @router.post("/signup",response_model=UserPublic)
-@limiter.limit("3/minute")
+@limiter.limit(rate_limit)
 def signup(request: Request, user: UserCreate,session: SessionDep):
     existing_user=session.exec(select(User).where(User.email==user.email)).first()
     if(existing_user is not None):
@@ -27,7 +29,7 @@ def signup(request: Request, user: UserCreate,session: SessionDep):
     return db_user
     
 @router.post("/login")
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def login(request: Request,session: SessionDep,form_data: OAuth2PasswordRequestForm = Depends()):
     existing_user= session.exec(select(User).where(User.email==form_data.username)).first()
     if(existing_user is None):

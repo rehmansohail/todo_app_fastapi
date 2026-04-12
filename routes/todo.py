@@ -10,10 +10,10 @@ from limiter import limiter
 router = APIRouter(tags=["todos"])
 SessionDep = Annotated[Session, Depends(get_session)]
 
-
+rate_limit="20/minute"
 
 @router.post("/todos", response_model=TodoPublic)
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def create_todo(request: Request, todo: TodoCreate, session: SessionDep,current_user: User = Depends(get_current_user)):
     db_todo = Todo(
     **todo.model_dump(),
@@ -26,7 +26,7 @@ def create_todo(request: Request, todo: TodoCreate, session: SessionDep,current_
 
 
 @router.get("/todos", response_model=list[TodoPublic])
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def read_todos(
     request: Request,
     session: SessionDep,
@@ -38,7 +38,7 @@ def read_todos(
     return todos
 
 @router.get("/todos/{todo_id}", response_model=TodoPublic)
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def read_todo(request: Request, todo_id: int, session: SessionDep,current_user: User = Depends(get_current_user)):
     todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
     if not todo:
@@ -46,7 +46,7 @@ def read_todo(request: Request, todo_id: int, session: SessionDep,current_user: 
     return todo
 
 @router.delete("/todos/{todo_id}")
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def delete_todo(request: Request, todo_id: int, session: SessionDep,current_user: User = Depends(get_current_user)):
     todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
     if not todo:
@@ -57,7 +57,7 @@ def delete_todo(request: Request, todo_id: int, session: SessionDep,current_user
 
 
 @router.patch("/todos/{todo_id}", response_model=TodoPublic)
-@limiter.limit("5/minute")
+@limiter.limit(rate_limit)
 def update_todo(request: Request, todo_id: int, todo: TodoUpdate, session: SessionDep,current_user: User= Depends(get_current_user)):
     todo_db = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
     if not todo_db:
