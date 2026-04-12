@@ -1,16 +1,18 @@
-from fastapi import APIRouter,HTTPException,Depends
+from fastapi import APIRouter,HTTPException,Depends,Request
 from typing import Annotated
 from sqlmodel import Session, select
 from models.user import *
 from database import get_session
 from security import *
 from fastapi.security import OAuth2PasswordRequestForm
+from limiter import limiter
 
 router = APIRouter(tags=["authentication"])
 SessionDep = Annotated[Session, Depends(get_session)]
 
 @router.post("/signup",response_model=UserPublic)
-def signup(user: UserCreate,session: SessionDep):
+@limiter.limit("3/minute")
+def signup(request: Request, user: UserCreate,session: SessionDep):
     existing_user=session.exec(select(User).where(User.email==user.email)).first()
     if(existing_user is not None):
         raise HTTPException(status_code=400, detail="User already exists")
@@ -25,7 +27,8 @@ def signup(user: UserCreate,session: SessionDep):
     return db_user
     
 @router.post("/login")
-def login(session: SessionDep,form_data: OAuth2PasswordRequestForm = Depends()):
+@limiter.limit("5/minute")
+def login(request: Request,session: SessionDep,form_data: OAuth2PasswordRequestForm = Depends()):
     existing_user= session.exec(select(User).where(User.email==form_data.username)).first()
     if(existing_user is None):
         raise HTTPException(status_code=400,detail="user doesnt exists, signup first")
