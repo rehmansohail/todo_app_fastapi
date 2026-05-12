@@ -84,7 +84,7 @@ pytest tests/
 Tests use a separate SQLite database and do not touch your production database.
 
 
-
+---
 ## Environment Variables
 
 | Variable | Description |
