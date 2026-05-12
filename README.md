@@ -8,29 +8,16 @@ A REST API backend for a multi-user todo application. Users can register, log in
 
 ---
 
-## Features
-
-- **JWT Authentication** — secure login/signup using `python-jose`, each user's todos are completely isolated from others
-- **Full CRUD for Todos** — create, read, update and delete tasks via `SQLModel` and `PostgreSQL`
-- **Rate Limiting** — all endpoints are limited to 20 requests/minute using `slowapi` to prevent spam
-- **Tests** — auth and todo flows covered using `pytest` and FastAPI's `TestClient` with a separate SQLite test database
-- **Dockerised** — includes a `Dockerfile` for easy local setup and deployment
-- **Cloud Deployed** — hosted on Render with a Neon PostgreSQL database
-
----
-
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | FastAPI |
-| Database ORM | SQLModel + SQLAlchemy |
-| Database | PostgreSQL (Neon) |
-| Authentication | JWT via python-jose, passwords hashed with passlib bcrypt |
-| Rate Limiting | SlowAPI |
-| Testing | Pytest + FastAPI TestClient |
-| Server | Uvicorn |
-| Deployment | Render (Docker) |
+- **Fastapi** — web framework
+- **SQLModel** — ORM (built on SQLAlchemy + Pydantic)
+- **PostgreSQL** — database (hosted on Neon)
+- **JWT** — authentication via python-jose
+- **Slow API** — for rate limiting
+- **Pytest** — for writing test cases
+- **Docker** — containerization
+- **Render** — deployment
 
 ---
 
@@ -96,20 +83,7 @@ pytest tests/
 
 Tests use a separate SQLite database and do not touch your production database.
 
----
 
-## What's Next
-
-This is a backend-only project right now, but there's a lot of room to grow:
-
-- **Frontend** — a proper UI so users don't have to interact through Swagger
-- **Task filtering** — sort and filter todos by completion status
-- **Timestamps** — track when a task was created and when it was completed
-- **AI integration** — let users ask for help on a specific task without leaving the app
-
-A simple todo list can be made remarkably powerful with the right features. If any of these interest you, fork the repo, build it out, and open a pull request — if the feature is solid I'll merge it in.
-
----
 
 ## Environment Variables
 
