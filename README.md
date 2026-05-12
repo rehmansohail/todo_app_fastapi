@@ -34,26 +34,7 @@ A REST API backend for a multi-user todo application. Users can register, log in
 
 ---
 
-## Project Structure
 
-```
-todo_app_fastapi/
-├── models/
-│   ├── todo.py        # Todo schemas and table definition
-│   └── user.py        # User schemas and table definition
-├── routes/
-│   ├── todo.py        # CRUD endpoints for todos
-│   └── auth.py        # Signup and login endpoints
-├── tests/
-│   ├── conftest.py    # Test fixtures, test database setup
-│   ├── test_auth.py   # Auth flow tests
-│   └── test_todo.py   # Todo CRUD tests
-├── main.py            # App entry point, middleware setup
-├── database.py        # Database connection and session
-├── security.py        # JWT logic, password hashing, current user dependency
-├── limiter.py         # Rate limiter setup
-└── Dockerfile
-```
 
 ## Running Locally
 
