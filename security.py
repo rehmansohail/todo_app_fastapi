@@ -41,7 +41,7 @@ def get_current_user(session: SessionDep,token:str=Depends(oauth2_scheme)):
         existing_user= session.exec(select(User).where(User.id==user_id)).first()
         if(existing_user is None):
             raise HTTPException(status_code=401,detail="user doesnt exists, signup first")
-        return int(user_id)
+        return existing_user
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 

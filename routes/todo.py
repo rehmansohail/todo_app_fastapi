@@ -17,7 +17,7 @@ rate_limit="20/minute"
 def create_todo(request: Request, todo: TodoCreate, session: SessionDep,current_user: User = Depends(get_current_user)):
     db_todo = Todo(
     **todo.model_dump(),
-    user_id=current_user
+    user_id=current_user.id
 )
     session.add(db_todo)
     session.commit()
@@ -34,13 +34,13 @@ def read_todos(
     limit: Annotated[int, Query(le=100)] = 100,
     current_user: User = Depends(get_current_user)
 ):
-    todos = session.exec(select(Todo).where(Todo.user_id==current_user).offset(offset).limit(limit)).all()
+    todos = session.exec(select(Todo).where(Todo.user_id==current_user.id).offset(offset).limit(limit)).all()
     return todos
 
 @router.get("/todos/{todo_id}", response_model=TodoPublic)
 @limiter.limit(rate_limit)
 def read_todo(request: Request, todo_id: int, session: SessionDep,current_user: User = Depends(get_current_user)):
-    todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
+    todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user.id)).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
     return todo
@@ -48,7 +48,7 @@ def read_todo(request: Request, todo_id: int, session: SessionDep,current_user: 
 @router.delete("/todos/{todo_id}")
 @limiter.limit(rate_limit)
 def delete_todo(request: Request, todo_id: int, session: SessionDep,current_user: User = Depends(get_current_user)):
-    todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
+    todo = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user.id)).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
     session.delete(todo)
@@ -59,7 +59,7 @@ def delete_todo(request: Request, todo_id: int, session: SessionDep,current_user
 @router.patch("/todos/{todo_id}", response_model=TodoPublic)
 @limiter.limit(rate_limit)
 def update_todo(request: Request, todo_id: int, todo: TodoUpdate, session: SessionDep,current_user: User= Depends(get_current_user)):
-    todo_db = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user)).first()
+    todo_db = session.exec(select(Todo).where(todo_id==Todo.id, Todo.user_id==current_user.id)).first()
     if not todo_db:
         raise HTTPException(status_code=404, detail="Todo not found")
     todo_data = todo.model_dump(exclude_unset=True)
